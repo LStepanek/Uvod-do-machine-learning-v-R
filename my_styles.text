@@ -1,0 +1,63 @@
+\usetheme{Boadilla}
+
+% článková matematická notace
+\usefonttheme[onlymath]{serif}
+
+% loaduju některé balíčky
+\usepackage{siunitx}
+\usepackage{amsmath}
+\usepackage{physics}
+\usepackage{amsfonts}
+\usepackage{array}
+\usepackage{multirow}
+
+
+% změna velikosti fontu
+\newcommand\reduceFontSize{\fontsize{8}{10}\selectfont}
+
+% bude se hodit
+\newcommand\floor[1]{\lfloor#1\rfloor}
+\newcommand\ceil[1]{\lceil#1\rceil}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\newcounter{savedenum}
+\newcommand*{\saveenum}{\setcounter{savedenum}{\theenumi}}
+\newcommand*{\resume}{\setcounter{enumi}{\thesavedenum}}
+
+\defbeamertemplate*{footline}{my footline}
+{
+    \ifnum \insertpagenumber=1
+		\leavevmode%
+		\hbox{%
+			\pgfsetfillopacity{1}\begin{beamercolorbox}[wd=.24\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+			  \usebeamerfont{author in head/foot}\pgfsetfillopacity{1}
+			\end{beamercolorbox}%
+			\pgfsetfillopacity{1}\begin{beamercolorbox}[wd=.52\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+			  \usebeamerfont{title in head/foot}\pgfsetfillopacity{1}
+			\end{beamercolorbox}%
+			\pgfsetfillopacity{1}\begin{beamercolorbox}[wd=.24\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+			  \insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+			\end{beamercolorbox}
+		  }%
+		\vskip0pt%
+    \else
+		\leavevmode%
+		\hbox{%
+			\pgfsetfillopacity{1}\begin{beamercolorbox}[wd=.24\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+			  \usebeamerfont{author in head/foot}\pgfsetfillopacity{1}O. Klempíř, L. Štěpánek
+			\end{beamercolorbox}%
+			\pgfsetfillopacity{1}\begin{beamercolorbox}[wd=.52\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+			  \usebeamerfont{title in head/foot}\pgfsetfillopacity{1}Úvod do machine learning v \textsf{R}
+			\end{beamercolorbox}%
+			\pgfsetfillopacity{1}\begin{beamercolorbox}[wd=.16\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+			  \usebeamerfont{date in head/foot}\pgfsetfillopacity{1}\insertshortdate{}
+			\end{beamercolorbox}%
+			\pgfsetfillopacity{1}\begin{beamercolorbox}[wd=.08\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%  
+			  \insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+			\end{beamercolorbox}
+		  }%
+		\vskip0pt%
+    \fi
+}
+
+\setbeamertemplate{footline}[my footline]
