@@ -1,0 +1,290 @@
+---
+title: |
+ | Číslo 5 žije a chce vědět víc
+ | aneb
+ | Úvod do machine learning v \textsf{R}
+ | spíše v pojetí biomedicíny
+subtitle: |
+ | ---
+ | Statistické dýchánky
+ | na VŠE
+author: |
+ | Ondřej Klempíř
+ | Lubomír Štěpánek
+institute: |
+ | Katedra biomedicínské informatiky
+ | Fakulta biomedicínského inženýrství
+ | České vysoké učení technické v Praze
+date: "8\\. listopadu 2016"
+classoption: t
+output:
+ beamer_presentation:
+  fig_caption: false
+  includes:
+   in_header: my_styles.tex
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+## Rychlý úvod
+
+- machine learning (\textit{strojové učení}) je velká množina algoritmů a technik, které umožňují počítačovému systému se samostatně učit (měnit jeho vnitřní stav, aniž by právě k tomu byl explicitně naprogramován)
+- algoritmy
+    - s učitelem
+    - bez učitele
+    - kombinace obou předchozích a další
+- základní typy úloh
+    - regresní úloha
+    - klasifikační úloha
+    - shlukování
+
+
+## 
+
+\vspace{+3.0cm}
+\begin{block}{}
+  \centering
+  Některé algoritmy v rámci klasifikační úlohy
+\end{block}
+
+
+## Bayesovská naïvní klasifikace
+
+- relativně jednoduchý algoritmus
+- MAP princip (\underline{M}aximum-\underline{A}-Posteriori-\underline{P}robability) - prvek je zařazen do třídy, která má na konci nejvyšší pravděpodobnost
+- buď $x = (x_{1}, x_{2}, \ldots, x_{m}, c_{i})$ jedno z pozorování v testovací množině popsané $m$ atributy a třídou $c_{i}$ pro jedno pevné $i \in \{1, 2, \ldots, k\}$
+- pak pravděpodobnost, že bude $x$ správně zařazeno do své třídy $c_{i}$, je
+
+$$p(c_{i} \mid x) = \frac{p(x \mid c_{i})p(c_{i})}{p(x)}$$
+
+- protože $p(x) = \frac{1}{\lvert \text{trénovací množina} \rvert} = konst.$ a pro daný dataset i $p(c_{i}) = \frac{\lvert \{y : \text{ } y \text{ je třídy } c_{i}\} \rvert}{\lvert \text{trénovací množina} \rvert} = konst.$, je
+
+$$p(c_{i} \mid x) \propto p(x \mid c_{i})\phantom{p(c_{i})}$$
+
+
+## Bayesovská naïvní klasifikace
+
+- za předpokladu nezávislosti atributů je
+
+\vspace{-1.5cm}
+\begin{align*}
+\phantom{i} &\phantom{= \argmax\limits_{i \in \{1, 2, \ldots k\}} \{ p(x \mid c_{i}) \}} \\
+p(x \mid c_{i}) &\propto \prod\limits_{j = 1}^{n} p(x_{j} \mid c_{i}) ,
+\end{align*}
+
+kde $n = \lvert \text{testovací množina} \rvert$, u nespojitých atributů odhadneme
+
+$$p(x_{j} \mid c_{i}) = \frac{\lvert \{\text{$y$: $y \in$ trén. množ. $\wedge$ $j$-tý atribut $y$ je $x_{j}$ $\wedge$ třída $y$ je $c_{i}$}\} \rvert}{\lvert \{\text{$z$: $z \in$ trénovací množina $\wedge$ třída $z$ je $c_{i}$}\} \rvert} ,$$
+
+u spojitých použijeme fitting normálním rozložením a $\phi(x_{j} \mid c_{i})$
+
+- $x$ je třídy $c_{i}$ tak, že
+
+$$i = \argmax\limits_{i \in \{1, 2, \ldots k\}} \{ p(x \mid c_{i}) \}$$
+
+
+## Bayesovská naïvní klasifikace
+
+- grafická interpretace typická pro Bayesův naïvní klasifikátor vlastně není
+- výstupem pro hodnocení přesnosti predikce modelu je konfuzní matice
+
+\begin{table}
+\vspace*{-0.3cm}
+\begin{tabular}{lccccc}
+\hline
+& & \multicolumn{4}{c}{přiřazená hodnota} \\
+\cline{2-6}
+& & $1$ & $2$ & \ldots & $k$ \\
+\hline
+\multirow{4}{*}{skutečná hodnota} & $1$ & $n_{11}$ & $n_{12}$ & $\cdots$ & $n_{1k}$ \\
+                                  & $2$ & $n_{21}$ & $n_{22}$ & $\cdots$ & $n_{2k}$ \\
+                                  & $\vdots$ & $\vdots$ & $\vdots$ & $\ddots$ & $\vdots$ \\
+                                  & $k$ & $n_{k1}$ & $n_{k2}$ & $\cdots$ & $n_{kk}$ \\
+\hline
+\end{tabular}
+\end{table}
+
+- přesnost (\textit{accuracy}) vyčíslíme jako podíl stopy a součtu konfuzní matice
+
+$$accuracy = \frac{\sum_{i = 1}^{k} n_{ii}}{\sum_{i = 1}^{k} \sum_{j = 1}^{k} n_{ij}}$$
+
+
+## Bayesovská naïvní klasifikace v \textsf{R}
+
+- knihovna `e1071`
+- funkce `naiveBayes()` s argumenty
+    - `formula` - závislá proměnná a na kterých prediktorech závisí
+    - `data`\hspace{+0.65cm}- dataframe trénovací množiny
+- funkce `predict()` s argumenty
+    - `object`\hspace{+0.20cm} - objekty typu model naïvní Bayesovské klasifikace
+    - `newdata` - dataframe testovací množiny
+    - `type`\hspace{+0.55cm} - když `"class"`, jsou vráceny predikované třídy, když `"raw"`; jsou vrácena maxima aposteriorních pravděpodobností
+- funkce `table()` pro konfuzní matici
+
+
+## Bayesovská naïvní klasifikace v \textsf{R}
+
+\scriptsize
+```{r, eval = T, echo = TRUE}
+
+## inicializuji balíček "e1071"
+suppressWarnings(library("e1071"))
+
+## loaduji data "HouseVotes84"
+data(HouseVotes84, package = "mlbench")
+head(HouseVotes84[, 1:16], 4)
+
+## náhodně rozděluji data "HouseVotes84" do trénovací
+## a testovací množiny
+set.seed(2016)
+
+train_set_indices <- sample(1:dim(HouseVotes84)[1],
+                            floor(0.6 * dim(HouseVotes84)[1]),
+                            replace = FALSE)
+
+train_set <- HouseVotes84[train_set_indices, ]
+test_set <- HouseVotes84[-train_set_indices, ]
+
+```
+
+
+## Bayesovská naïvní klasifikace v \textsf{R}
+
+\scriptsize
+```{r, eval = T, echo = TRUE}
+
+## vytvářím model
+my_bayes <- naiveBayes(Class ~ ., data = train_set)
+
+## a dívám se na první z predikovaných hodnot
+head(predict(my_bayes, test_set, type = "class"))
+head(predict(my_bayes, test_set, type = "raw"), 3)
+
+## vytvářím a dívám se na konfuzní matici
+(confusion_matrix <- table(test_set$Class, predict(my_bayes, test_set)))
+
+```
+
+
+## Bayesovská naïvní klasifikace v \textsf{R}
+
+\scriptsize
+```{r, eval = T, echo = TRUE}
+
+## počítám přesnost
+sum(diag(confusion_matrix)) / sum(confusion_matrix)
+
+```
+
+
+## Rozhodovací stromy
+
+- princip: trénovací množina je postupně rozdělována na stále menší podmnožiny tak, aby v každé podmnožině převládaly prvky jedné třídy
+- tedy princip „rozděl a panuj“ („divide and conquer“), metoda známa jako \textit{top-down induction of decision tree} (TDIDT)
+- v každé iteraci vyberou některý z atributů a určí její hodnotu tak, že trénovací množina je pak hodnotou této proměnné „nejlépe“ rozdělena ve smyslu některé diskriminační metriky
+- vzniká tak graf typu strom
+
+
+## Rozhodovací stromy
+- metriky, které jsou pro atributy maximalizovány
+    - Giniho index
+    \vspace{-1.7cm}
+    \begin{align*}
+    \phantom{\textit{informační zisk}_{i}} &\phantom{= - \sum_{j = 1}^{k} p_{ij} \log_{2} p_{ij}} \\
+    \textit{Giniho index}_{i} &= 1 - \sum_{j = 1}^{k} p_{ij}^{2}
+    \end{align*}
+    - informační zisk
+    $$\textit{informační zisk}_{i} = - \sum_{j = 1}^{k} p_{ij} \log_{2} p_{ij}$$
+    - deviance
+    \vspace{-1.7cm}
+    \begin{align*}
+    \phantom{\textit{informační zisk}_{i}} &\phantom{= - \sum_{j = 1}^{k} p_{ij} \log_{2} p_{ij}} \\
+    \textit{deviance}_{i} &= - 2\sum_{j = 1}^{k} n_{ij} \ln p_{ij}
+    \end{align*}
+- kde $p_{ij}$ je pravděpodobnost existence $j$–té třídy v $i$–tém uzlu, $n_{ij}$ je počet pozorování $j$–té třídy v podmnožině $i$–tého uzlu, $k$ je počet tříd
+
+
+## Rozhodovací stromy
+
+- \textit{pruning} - prořezání výsledného stromu (tj. neuvažování koncových větví stromu od určitého stupně větvení)
+    - pomocí $k$-násobné křížové validace
+    - nebo porovnáním nevysvětlené variability vs. počtu uzlů stromu (v diagramu \textit{elbow fenomén})
+    - apod.
+
+
+## Rozhodovací stromy
+
+\center
+![](./kvalita_tree.jpg)
+
+
+## Rozhodovací stromy v \textsf{R}
+
+- knihovna `tree`
+- funkce `tree()` s argumenty
+    - `formula` - závislá proměnná a na kterých prediktorech závisí
+    - `data`\hspace{+0.65cm}- dataframe trénovací množiny
+- funkce `predict()` s argumenty
+    - `object`\hspace{+0.20cm} - objekty typu model naïvní Bayesovské klasifikace
+    - `newdata` - dataframe testovací množiny
+    - `type`\hspace{+0.55cm} - když `"class"`, jsou vráceny predikované třídy, když `"raw"`; jsou vrácena maxima aposteriorních pravděpodobností
+- funkce `table()` pro konfuzní matici
+
+
+## Neuronové sítě
+
+- v padesátých letech navržen první model McCullochem a Pittsem
+
+$$Y = S(\sum_{i = 1}^{n}(w_{i}x_{i}) + \theta) ,$$
+
+kde $x_{i}$ jsou vstupy neuronu, $w_{i}$ jsou synaptické váhy pro $i \in \{1, 2, \ldots, n\}$, $\theta$ je práh, $S(x)$ je přenosová, též aktivační funkce neuronu a $Y$ je výstup neuronu
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height = 2.5cm]{neural_net.jpg}
+\end{figure}
+
+
+## Neuronové sítě
+\center
+![](./intenzita_nnet.jpg)
+
+
+## Neuronové sítě v \textsf{R}
+
+- knihovna `neuralnet`
+- funkce `neuralnet()` s argumenty
+    - `formula` - závislá proměnná a na kterých prediktorech závisí
+    - `hidden`\hspace{+0.15cm} - počet skrytých vrstev
+    - `linear.output` - zda se jedná o spojitou predikovanou proměnnou
+    - `data`\hspace{+0.65cm}- dataframe trénovací množiny
+    - `threshold` - prah pro prahovou funkci
+- funkce `predict()` s argumenty
+    - `object`\hspace{+0.20cm} - objekty typu model naïvní Bayesovské klasifikace
+    - `newdata` - dataframe testovací množiny
+    - `type`\hspace{+0.55cm} - když `"class"`, jsou vráceny predikované třídy, když `"raw"`; jsou vrácena maxima aposteriorních pravděpodobností
+- funkce `table()` pro konfuzní matici
+
+
+## Hands-on! Your turn!
+
+- samplová data, skripty a tato prezentace na adrese
+
+\centering
+\href{https://github.com/LStepanek/Uvod-do-machine-learning-v-R/}{https://github.com/LStepanek/Uvod-do-machine-learning-v-R/}
+
+
+## 
+
+\vspace{+3.0cm}
+\begin{block}{\centering Děkujeme za pozornost!}
+  \center
+  \begin{tabular}{l@{}l@{}l}
+    &\href{mailto:ondrej.klempir@fbmi.cvut.cz}{ondrej.klempir@fbmi.cvut.cz} \\
+    &\href{mailto:lubomir.stepanek@fbmi.cvut.cz}{lubomir.stepanek@fbmi.cvut.cz}
+  \end{tabular}
+\end{block}
+
