@@ -121,7 +121,7 @@ getMyAccuracy(table(test_set$smer, predict(my_bayes, test_set)))
 
 ## automatizuji předchozí proces ----------------------------------------------
 
-for(i in c(6, 7, 8, 9, 22, 2, 4)){
+for(i in c(6, 7, 8, 9, 2, 4)){
 
 formula = paste(
     "my_bayes <- naiveBayes(",
