@@ -10,7 +10,7 @@ for(my_package in c("openxlsx", "e1071", "tree", "neuralnet", "RCurl")){
         install.packages(my_package, dependencies = TRUE)
     }
     
-    library(my_package)
+    library(my_package, character.only = TRUE)
     
 }
 
