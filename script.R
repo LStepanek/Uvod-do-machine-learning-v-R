@@ -160,7 +160,7 @@ for(j in 1:3){print("")}
 
 ## zkouším rozhodovací stromy -------------------------------------------------
 
-my_tree <- tree(smer~., data = train_set[,c(6, 10:21)])
+my_tree <- tree(smer ~ ., data = train_set[, c(6, 10:21)])
 
 summary(my_tree)
 plot(my_tree)
@@ -182,7 +182,7 @@ getMyAccuracy(
 
 ## prořezávám strom -----------------------------------------------------------
 
-my_pruned_tree <- prune.misclass(my_tree, best = 7)
+my_pruned_tree <- prune.misclass(my_tree, best = 5)
 
 
 ## přesnost -------------------------------------------------------------------
